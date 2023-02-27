@@ -1,0 +1,33 @@
+{
+  "name": "bublina",
+  "private": true,
+  "version": "0.1.0",
+  "author": "Tomas Durica",
+  "license": "ISC",
+  "description": "",
+  "keywords": [],
+  "scripts": {
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@bublina/store": "workspace:*",
+    "@types/fast-json-stable-stringify": "^2.1.0",
+    "@vue/eslint-config-typescript": "^11.0.2",
+    "@vue/test-utils": "^2.3.0",
+    "bumpp": "^9.0.0",
+    "del": "^7.0.0",
+    "eslint": "^8.34.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.6.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-vue": "^9.9.0",
+    "happy-dom": "^8.9.0",
+    "rollup": "^3.17.3",
+    "rollup-plugin-ts": "^3.2.0",
+    "typescript": "^4.9.5",
+    "unplugin-auto-import": "^0.15.0",
+    "vitest": "^0.29.1",
+    "vue": "^3.2.47"
+  }
+}

@@ -1,0 +1,18 @@
+﻿{
+  "root": true,
+  "extends": [
+    "standard",
+    "eslint:recommended",
+    "plugin:vue/vue3-recommended",
+    "@vue/eslint-config-typescript/recommended",
+    ".eslintrc-auto-import.json"
+  ],
+  "rules": {
+    "operator-linebreak": ["error", "before"],
+    "space-before-function-paren": ["error", {
+      "anonymous": "always",
+      "named": "never",
+      "asyncArrow": "always"
+    }]
+  }
+}

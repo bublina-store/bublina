@@ -1,0 +1,32 @@
+﻿{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "ESNext",
+    "target": "ESNext",
+    "lib": ["DOM", "ESNext"],
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "noUnusedLocals": false,
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": [
+      "vitest",
+      "vite/client",
+      "fast-json-stable-stringify"
+    ],
+    "typeRoots": [
+      "auto-imports.d.ts"
+    ],
+    "declaration": true,
+    "paths": {
+      "@bublina/store": ["/packages/store/index.ts"],
+    }
+  },
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
+}
