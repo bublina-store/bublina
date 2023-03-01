@@ -2,7 +2,7 @@ import type { Ref } from 'vue'
 import hash from 'fast-json-stable-stringify'
 
 type Fn = (...args: unknown[]) => unknown
-export type Store = Record<string, Ref<unknown> | Fn>
+export type Store = Ref<unknown> | Record<string, Ref<unknown> | Fn>
 
 export const createContext = <TStore extends Store>() => {
   const context = new Map<string, TStore>()

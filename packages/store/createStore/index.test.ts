@@ -1,4 +1,5 @@
 import { createStore, createContextProvider } from '@bublina/store'
+import { Ref } from 'vue'
 
 describe('createStore', () => {
   test('dev', () => {
@@ -85,5 +86,21 @@ describe('createStore', () => {
     expect(a.value.value).toBe(1)
     expect(b.value.value).toBe(2)
     expect(c.value.value).toBe(2)
+  })
+
+  describe('types', () => {
+    it('infers useStore parameters from setup', () => {
+      expectTypeOf(createStore('without parameters', () => ({}))).toMatchTypeOf<() => Record<string, never>>()
+      expectTypeOf(createStore('without parameters', () => ({}))).not.toMatchTypeOf<() => Ref<unknown>>()
+
+      expectTypeOf(createStore('without parameters', () => ref())).toMatchTypeOf<() => Ref<unknown>>()
+      expectTypeOf(createStore('without parameters', () => ref())).not.toMatchTypeOf<() => Record<string, never>>()
+
+      type A = 'a'
+      type B = 'b'
+
+      expectTypeOf(createStore('without parameters', (a: A, b: B) => ({}))).toMatchTypeOf<(a: Ref<A>, b: Ref<B>) => Record<string, never>>()
+      expectTypeOf(createStore('without parameters', (a: A, b: B) => ({}))).toMatchTypeOf<(a: A, b: B) => Record<string, never>>()
+    })
   })
 })

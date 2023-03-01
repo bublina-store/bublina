@@ -19,6 +19,15 @@ const mapObjectValues = <TFrom, TTo>(obj: Record<string, TFrom>, fn: (value: TFr
   )
 }
 
+const mapRef = <T>(from: () => Ref<T>) => computed({
+  get: () => from().value,
+  set: (newValue) => {
+    from().value = newValue
+  }
+})
+
+const mapFunction = <TArgs extends readonly unknown[], TReturn>(from: (...args: TArgs) => TReturn) => (...args: TArgs) => from(...args)
+
 type CreateStoreOptions = {
   contextProvider?: ContextProvider
 }
@@ -34,18 +43,19 @@ export const createStore = <TStore extends Store, TArgs extends readonly unknown
     const args = computed(() => mappedArgs.map(unref) as unknown as TArgs)
     const store = context.getInstance(args, storeFn)
 
-    return mapObjectValues(unref(store), (value, key) => {
+    const storeDefinition = unref(store)
+
+    if (isRef(storeDefinition)) {
+      return mapRef(() => unref(store) as Ref<unknown>) as Ref<unknown> as TStore
+    }
+
+    return mapObjectValues(storeDefinition, (value, key) => {
       if (typeof value === 'function') {
-        return (...args: unknown[]) => (unref(store)[key] as typeof value)(...args)
+        return mapFunction(() => unref(store)[key])
       }
 
       if (isRef(value)) {
-        return computed({
-          get: () => (unref(store)[key] as typeof value).value,
-          set: (newValue) => {
-            (unref(store)[key] as typeof value).value = newValue
-          }
-        })
+        return mapRef(() => unref(store)[key])
       }
 
       throw new Error(`Unexpected value for store "${name}" and key "${key}"`)
