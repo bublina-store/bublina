@@ -8,6 +8,12 @@ type SetupDevtoolsOptions = {
 
 const storeInspectorId = '@bublina/store:inspector'
 
+const colors = {
+  active: { textColor: 0, backgroundColor: 0x00ff00 }
+}
+
+const prettyPrint = (store: string, key: string) => `${store}(${key.substring(1, key.length - 1)})`
+
 export const setupDevtools = (app: App, { contextProvider }: SetupDevtoolsOptions) => {
   setupDevtoolsPlugin({
     id: '@bublina/store',
@@ -28,9 +34,14 @@ export const setupDevtools = (app: App, { contextProvider }: SetupDevtoolsOption
       payload.rootNodes = contextProvider.entries().map(([storeName, context]) => ({
         id: JSON.stringify({ type: 'store', storeName }),
         label: storeName,
-        children: context.entries().map(([instanceName]) => ({
+        tags: [],
+        children: context.entries().map(([instanceName, instance]) => ({
           id: JSON.stringify({ type: 'instance', storeName, instanceName }),
-          label: instanceName
+          label: prettyPrint(storeName, instanceName),
+          tags: [
+            // { label: `Components: ${instance.referencedComponentsCount}`, textColor: 0xffffff, backgroundColor: 0x4203ab },
+            { label: `Dependencies: ${instance.dependencyTracker.dependencies.length}`, textColor: 0xffffff, backgroundColor: 0x0342ab }
+          ]
         }))
       }))
     })
@@ -49,14 +60,14 @@ export const setupDevtools = (app: App, { contextProvider }: SetupDevtoolsOption
         case 'store':
           payload.state = {
             '': [
-              { key: 'Store', value: storeName }
+              { key: 'Setup', value: storeName }
             ]
           }
           break
         case 'instance':
           payload.state = {
             ' Values': Object
-              .entries(instance)
+              .entries(instance.store)
               .filter(([, value]) => isRef(value))
               .map(([key, value]) => ({
                 key,
@@ -64,11 +75,21 @@ export const setupDevtools = (app: App, { contextProvider }: SetupDevtoolsOption
                 objectType: 'ref'
               })),
             Actions: Object
-              .entries(instance)
+              .entries(instance.store)
               .filter(([, value]) => typeof value === 'function')
               .map(([key, value]) => ({
                 key,
                 value,
+                objectType: 'other'
+              })),
+            Parameters: (JSON.parse(instanceName) as unknown[]).map((value, index) => ({
+              key: index.toString(),
+              value
+            })),
+            Dependencies: instance.dependencyTracker.dependencies
+              .map((dependency, key) => ({
+                key: key.toString(),
+                value: `${dependency.name}(${dependency.key.substring(1, dependency.key.length - 1)})`,
                 objectType: 'other'
               }))
           }

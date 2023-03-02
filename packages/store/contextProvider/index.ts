@@ -12,7 +12,7 @@ export const createContextProvider = () => {
       return contexts.get(name)
     }
 
-    const context = createContext<TStore>()
+    const context = createContext<TStore>(name)
 
     contexts.set(name, context)
 

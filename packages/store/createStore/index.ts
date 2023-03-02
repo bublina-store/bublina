@@ -40,8 +40,7 @@ export const createStore = <TStore extends Store, TArgs extends readonly unknown
   return (...mappedArgs: MapArgs<TArgs>) => {
     const context = options.contextProvider?.getContext<TStore>(name) ?? useContext<TStore>(name)
 
-    const args = computed(() => mappedArgs.map(unref) as unknown as TArgs)
-    const store = context.getInstance(args, storeFn)
+    const store = context.getStore(mappedArgs, storeFn)
 
     const storeDefinition = unref(store)
 
