@@ -1,7 +1,14 @@
-import { defineConfig, presetUno } from 'unocss'
+import { defineConfig, presetIcons, presetUno } from 'unocss'
 
 export default defineConfig({
   presets: [
-    presetUno()
+    presetUno(),
+    presetIcons({
+      extraProperties: {
+        display: 'inline-block',
+        width: '1.5rem',
+        height: '1.5rem'
+      }
+    })
   ]
 }) as unknown

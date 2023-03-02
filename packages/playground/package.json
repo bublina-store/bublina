@@ -1,5 +1,5 @@
 {
-  "name": "@bublina/store",
+  "name": "@bublina/playground",
   "private": true,
   "version": "0.0.0",
   "author": "Tomas Durica",
@@ -11,10 +11,12 @@
   },
   "dependencies": {
     "@bublina/store": "workspace:*",
+    "@faker-js/faker": "^7.6.0",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
+    "@iconify-json/material-symbols": "^1.1.32",
     "@unocss/reset": "^0.50.1",
     "@vitejs/plugin-vue": "^4.0.0",
     "unocss": "^0.50.1",

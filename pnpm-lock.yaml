@@ -47,6 +47,8 @@ importers:
   packages/playground:
     specifiers:
       '@bublina/store': workspace:*
+      '@faker-js/faker': ^7.6.0
+      '@iconify-json/material-symbols': ^1.1.32
       '@unocss/reset': ^0.50.1
       '@vitejs/plugin-vue': ^4.0.0
       unocss: ^0.50.1
@@ -57,6 +59,8 @@ importers:
       vue-router: ^4.1.6
     dependencies:
       '@bublina/store': link:../store
+      '@faker-js/faker': 7.6.0
+      '@iconify-json/material-symbols': 1.1.32
       vue: 3.2.47
       vue-router: 4.1.6_vue@3.2.47
     devDependencies:
@@ -519,6 +523,11 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
 
+  /@faker-js/faker/7.6.0:
+    resolution: {integrity: sha512-XK6BTq1NDMo9Xqw/YkYyGjSsg44fbNwYRx7QK2CuoQgyy+f1rrTDHoExVM5PsyXCtfl2vs2vVJ0MN0yN6LppRw==}
+    engines: {node: '>=14.0.0', npm: '>=6.0.0'}
+    dev: false
+
   /@humanwhocodes/config-array/0.11.8:
     resolution: {integrity: sha512-UybHIJzJnR5Qc/MsD9Kr+RpO2h+/P1GhOwdiLPXK5TWk5sgTdu88bTD9UP+CKbPPh5Rni1u0GjAdYQLemG8g+g==}
     engines: {node: '>=10.10.0'}
@@ -539,9 +548,14 @@ packages:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
     dev: true
 
+  /@iconify-json/material-symbols/1.1.32:
+    resolution: {integrity: sha512-gC05Wcs/rv3IFWyJ1ugFXR7ENQIZ8dVX1tBruV0/jJc7bpUCvNBY8/dEKO5oq/XkTi8Q4bazCgN3NeKcFPlnMg==}
+    dependencies:
+      '@iconify/types': 2.0.0
+    dev: false
+
   /@iconify/types/2.0.0:
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
-    dev: true
 
   /@iconify/utils/2.1.4:
     resolution: {integrity: sha512-7vzsYIvxv5Hng0MNEtSSnyMBD/+zqnORqmKiYsSgpMBGSz1r93URgBZHPYCZ1/gpoaVstYW4/SVLGCMJBNMCLQ==}

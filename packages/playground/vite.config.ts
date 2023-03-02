@@ -14,7 +14,10 @@ export default defineConfig({
   },
   plugins: [
     Vue(),
-    Pages(),
+    Pages({
+      extensions: ['vue'],
+      exclude: ['**/components/*.vue']
+    }),
     AutoImport({
       imports: [
         'vue',
