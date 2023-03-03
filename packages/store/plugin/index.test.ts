@@ -1,13 +1,13 @@
-import plugin, { createContextProvider, useContextProvider } from '@bublina/store'
+import plugin, { createStoreProvider, useStoreProvider } from '@bublina/store'
 
 describe('plugin', () => {
   describe('when contextProvider is passed in options', () => {
     describe('useContextProvider', () => {
       it('return provider passed in options', () => {
-        const contextProvider = createContextProvider()
+        const contextProvider = createStoreProvider()
 
         mount(() => {
-          const componentContextProvider = useContextProvider()
+          const componentContextProvider = useStoreProvider()
 
           expect(componentContextProvider).toBe(contextProvider)
         }, {
@@ -18,11 +18,11 @@ describe('plugin', () => {
       })
 
       it('always returns the same provider', () => {
-        const contextProvider = createContextProvider()
+        const contextProvider = createStoreProvider()
 
         mount(() => {
-          const componentContextProvider1 = useContextProvider()
-          const componentContextProvider2 = useContextProvider()
+          const componentContextProvider1 = useStoreProvider()
+          const componentContextProvider2 = useStoreProvider()
 
           expect(componentContextProvider1).toBe(componentContextProvider2)
         }, {
@@ -37,8 +37,8 @@ describe('plugin', () => {
   describe('useContextProvider', () => {
     it('always returns the same provider', () => {
       mount(() => {
-        const componentContextProvider1 = useContextProvider()
-        const componentContextProvider2 = useContextProvider()
+        const componentContextProvider1 = useStoreProvider()
+        const componentContextProvider2 = useStoreProvider()
 
         expect(componentContextProvider1).toBe(componentContextProvider2)
       }, {

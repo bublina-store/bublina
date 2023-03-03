@@ -1,19 +1,18 @@
 import type { App } from 'vue'
-import type { ContextProvider } from '../contextProvider'
-import { createContextProvider, StoreName } from '../contextProvider'
+import type { StoreProvider } from '../storeProvider'
+import { createStoreProvider } from '../storeProvider'
 import { setupDevtools } from '../devtools'
-import { Store } from '../context'
 
 const __CONTEXT_PROVIDER_SYMBOL = Symbol('contextProvider')
 
 export type PluginOptions = {
-  contextProvider?: ContextProvider,
+  storeProvider?: StoreProvider,
   devtools?: boolean
 }
 
 export default {
   install: (app: App, options: PluginOptions = { devtools: true }) => {
-    const contextProvider = options.contextProvider ?? createContextProvider()
+    const contextProvider = options.storeProvider ?? createStoreProvider()
 
     app.provide(__CONTEXT_PROVIDER_SYMBOL, contextProvider)
 
@@ -23,6 +22,9 @@ export default {
   }
 }
 
-export const useContextProvider = () => inject<ContextProvider>(__CONTEXT_PROVIDER_SYMBOL)
-
-export const useContext = <TStore extends Store>(name: StoreName) => useContextProvider().getContext<TStore>(name)
+export const useStoreProvider = (
+  contextProvider?: StoreProvider
+) => {
+  return contextProvider
+    ?? inject<StoreProvider>(__CONTEXT_PROVIDER_SYMBOL)
+}

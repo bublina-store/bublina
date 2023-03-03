@@ -12,6 +12,8 @@
     "noUnusedLocals": false,
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
     "types": [
       "vitest",
       "vite/client",
@@ -22,7 +24,7 @@
     ],
     "declaration": true,
     "paths": {
-      "@bublina/store": ["/packages/store/index.ts"],
+      "@bublina/store": ["/packages/store/index.ts"]
     }
   },
   "exclude": [

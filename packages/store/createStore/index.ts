@@ -1,63 +1,79 @@
-﻿import type { Ref } from 'vue'
-import type { ContextProvider, StoreName } from '../contextProvider'
-import type { Store } from '../context'
-import { useContext } from '../plugin'
+﻿import type { ComputedRef, Ref } from 'vue'
+import type { Fn, Store, StoreName } from '../types'
+import hash from 'fast-json-stable-stringify'
+import { mapObjectValues } from '../utilities/mapObjectValues'
+import { StoreProvider } from '../storeProvider'
 
-type MaybeRef<T> = T | Ref<T>
-
-type StoreSetup<TArgs extends readonly unknown[], TStore extends Store> = (...args: TArgs) => TStore
+type StoreSetup<TArgs extends readonly unknown[], TStore extends Store> = Fn<TArgs, TStore>
 
 type MapArgs<TArgs extends readonly unknown[]> = {
-  [K in keyof TArgs]: MaybeRef<TArgs[K]>
+  [K in keyof TArgs]: TArgs[K] | Ref<TArgs[K]>
 }
 
-const mapObjectValues = <TFrom, TTo>(obj: Record<string, TFrom>, fn: (value: TFrom, key: string) => TTo): Record<string, TTo> => {
-  return Object.fromEntries(
-    Object
-      .entries(obj)
-      .map(([key, value]) => [key, fn(value, key)])
-  )
-}
-
-const mapRef = <T>(from: () => Ref<T>) => computed({
-  get: () => from().value,
-  set: (newValue) => {
-    from().value = newValue
-  }
-})
-
-const mapFunction = <TArgs extends readonly unknown[], TReturn>(from: (...args: TArgs) => TReturn) => (...args: TArgs) => from(...args)
-
-type CreateStoreOptions = {
-  contextProvider?: ContextProvider
+type StoreOptions = {
+  storeProvider?: StoreProvider
 }
 
 export const createStore = <TStore extends Store, TArgs extends readonly unknown[]>(
   name: StoreName,
-  storeFn: StoreSetup<TArgs, TStore>,
-  options: CreateStoreOptions = { }
+  setupFn: StoreSetup<TArgs, TStore>,
+  storeOptions?: StoreOptions
 ) => {
+  const id = Symbol(name)
+  const instances = new Map<string, TStore>()
+
   return (...mappedArgs: MapArgs<TArgs>) => {
-    const context = options.contextProvider?.getContext<TStore>(name) ?? useContext<TStore>(name)
+    const storeRef = computed(() => {
+      const args = mappedArgs.map(unref) as unknown as TArgs
+      const key = hash(args)
 
-    const store = context.getStore(mappedArgs, storeFn)
-
-    const storeDefinition = unref(store)
-
-    if (isRef(storeDefinition)) {
-      return mapRef(() => unref(store) as Ref<unknown>) as Ref<unknown> as TStore
-    }
-
-    return mapObjectValues(storeDefinition, (value, key) => {
-      if (typeof value === 'function') {
-        return mapFunction(() => unref(store)[key])
+      if (instances.has(key)) {
+        return instances.get(key) as TStore
       }
 
-      if (isRef(value)) {
-        return mapRef(() => unref(store)[key])
-      }
+      const storeId = Symbol(`${name}${key}`)
+      const store = setupFn(...args)
 
-      throw new Error(`Unexpected value for store "${name}" and key "${key}"`)
-    }) as TStore
+      instances.set(key, store)
+
+      return store
+    })
+
+    return createStoreProxy(name, storeRef)
   }
 }
+
+const createStoreProxy = <TStore extends Store>(
+  name: StoreName,
+  store: ComputedRef<TStore>
+) => {
+  const storeDefinition = unref(store)
+
+  if (isRef(storeDefinition)) {
+    return mapRef(() => unref(store) as typeof storeDefinition) as TStore
+  }
+
+  return mapObjectValues(storeDefinition, (value, key) => {
+    if (typeof value === 'function') {
+      return mapFunction(() => (unref(store) as Exclude<typeof storeDefinition, Ref>)[key])
+    }
+
+    if (isRef(value)) {
+      return mapRef(() => (unref(store) as Exclude<typeof storeDefinition, Ref>)[key] as typeof value)
+    }
+
+    throw new Error(`Unexpected value for store "${name}" and key "${key}"`)
+  }) as TStore
+}
+
+const mapRef = <T>(proxy: Fn<never, Ref<T>>) => computed({
+  get: () => proxy().value,
+  set: (newValue) => {
+    proxy().value = newValue
+  }
+}) as Ref<T>
+
+const mapFunction = <
+  TArgs extends readonly unknown[],
+  TReturn
+>(proxy: Fn<TArgs, TReturn>) => (...args: TArgs) => proxy(...args)

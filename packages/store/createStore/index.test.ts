@@ -1,17 +1,16 @@
-import { createStore, createContextProvider } from '@bublina/store'
+import { createStore } from '@bublina/store'
 import { Ref } from 'vue'
+import { Fn, Store } from '../types'
 
 describe('createStore', () => {
   test('dev', () => {
-    const contextProvider = createContextProvider()
-
-    const useTestStore = createStore('test', (name: string) => {
+    const useTestStore = createTestStore('test', (name: string) => {
       const value = ref(0)
 
       return {
         value
       }
-    }, { contextProvider })
+    })
 
     const a = useTestStore('a')
     const b = useTestStore('b')
@@ -26,15 +25,13 @@ describe('createStore', () => {
   })
 
   test('dev', () => {
-    const contextProvider = createContextProvider()
-
-    const useTestStore = createStore('test', (name: string) => {
+    const useTestStore = createTestStore('test', (name: string) => {
       const value = ref(0)
 
       return {
         value
       }
-    }, { contextProvider })
+    })
 
     const a = useTestStore('a')
     const b = useTestStore('a')
@@ -49,15 +46,13 @@ describe('createStore', () => {
   })
 
   test('dev', () => {
-    const contextProvider = createContextProvider()
-
-    const useTestStore = createStore('test', (name: string) => {
+    const useTestStore = createTestStore('test', (name: string) => {
       const value = ref(0)
 
       return {
         value
       }
-    }, { contextProvider })
+    })
 
     const name = ref<'a' | 'b'>('a')
 
@@ -88,19 +83,65 @@ describe('createStore', () => {
     expect(c.value.value).toBe(2)
   })
 
-  describe('types', () => {
-    it('infers useStore parameters from setup', () => {
-      expectTypeOf(createStore('without parameters', () => ({}))).toMatchTypeOf<() => Record<string, never>>()
-      expectTypeOf(createStore('without parameters', () => ({}))).not.toMatchTypeOf<() => Ref<unknown>>()
+  describe('type inference', () => {
+    describe('returned function', () => {
+      describe('when setupFn is without parameters', () => {
+        it('should not require parameters', () => {
+          expectTypeOf(createStore('ref', () => ref())).toMatchTypeOf<() => unknown>()
+          expectTypeOf(createStore('state and actions', () => ({}))).toMatchTypeOf<() => unknown>()
+        })
+      })
 
-      expectTypeOf(createStore('without parameters', () => ref())).toMatchTypeOf<() => Ref<unknown>>()
-      expectTypeOf(createStore('without parameters', () => ref())).not.toMatchTypeOf<() => Record<string, never>>()
+      describe('when setupFn is with parameters', () => {
+        it('should require parameters in either value or ref form', () => {
+          type A = 'a'
+          type B = 'b'
 
-      type A = 'a'
-      type B = 'b'
+          expectTypeOf(createStore('that returns ref', (a: A, b: B) => ref()))
+            .toMatchTypeOf<(a: A | Ref<A>, b: B | Ref<B>) => unknown>()
 
-      expectTypeOf(createStore('without parameters', (a: A, b: B) => ({}))).toMatchTypeOf<(a: Ref<A>, b: Ref<B>) => Record<string, never>>()
-      expectTypeOf(createStore('without parameters', (a: A, b: B) => ({}))).toMatchTypeOf<(a: A, b: B) => Record<string, never>>()
+          expectTypeOf(createStore('that returns state and actions', (a: A, b: B) => ({})))
+            .toMatchTypeOf<(a: A | Ref<A>, b: B | Ref<B>) => unknown>()
+        })
+      })
+
+      describe('when setupFn returns simple ref', () => {
+        it('return a simple ref', () => {
+          type A = 'a'
+          type B = 'b'
+          type Result = 'result'
+
+          expectTypeOf(createStore('without parameters', () => ref('result' as Result)))
+            .toMatchTypeOf<() => Ref<Result>>()
+
+          expectTypeOf(createStore('with parameters', (a: A, b: B) => ref('result' as Result)))
+            .toMatchTypeOf<(a: A | Ref<A>, b: B | Ref<B>) => Ref<Result>>()
+        })
+      })
+
+      describe('when setupFn returns actions and refs', () => {
+        it('return actions and refs', () => {
+          type A = 'a'
+          type B = 'b'
+          type Result = 'result'
+          type Action = () => void
+
+          const store = ({
+            r: ref<Result>('result'),
+            a: () => ({}) as Action
+          })
+
+          expectTypeOf(createStore('without parameters', () => store))
+            .toMatchTypeOf<() => typeof store>()
+
+          expectTypeOf(createStore('with parameters', (a: A, b: B) => store))
+            .toMatchTypeOf<(a: A | Ref<A>, b: B | Ref<B>) => typeof store>()
+        })
+      })
     })
   })
 })
+
+const createTestStore = <TStore extends Store, TArgs extends unknown[]>(name: string, setupFn: Fn<TArgs, TStore>) => {
+  return createStore<TStore, TArgs>(name, setupFn)
+}
