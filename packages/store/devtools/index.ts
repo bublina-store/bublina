@@ -32,10 +32,10 @@ export const setupDevtools = (app: App, { contextProvider }: SetupDevtoolsOption
         return
       }
 
-      payload.rootNodes = [...contextProvider.storeIds.entries()].map(([storeDefinitionId, keys]) => ({
+      payload.rootNodes = [...contextProvider.storeDefinitions.entries()].map(([storeDefinitionId, storeDefinition]) => ({
         id: storeDefinitionId.toString(),
         label: storeDefinitionId.toString(),
-        children: [...keys.entries()].map(([key, storeId]) => {
+        children: storeDefinition.entries().map(([_, storeId]) => {
           const instance = contextProvider.instances.get(storeId)
 
           return {

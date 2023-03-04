@@ -33,6 +33,6 @@ export const createStore = <TStore extends Store, TArgs extends readonly unknown
 
     const args = computed(() => mappedArgs.map(unref) as unknown as TArgs)
 
-    return createStoreProxy(storeDefinition.get(args))
+    return createStoreProxy(storeDefinition.getStore(args))
   }
 }
