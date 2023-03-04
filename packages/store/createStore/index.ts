@@ -3,6 +3,7 @@ import type { Fn, Store, StoreName } from '../types'
 import hash from 'fast-json-stable-stringify'
 import { mapObjectValues } from '../utilities/mapObjectValues'
 import { StoreProvider } from '../storeProvider'
+import { useStoreProvider } from '../plugin'
 
 type StoreSetup<TArgs extends readonly unknown[], TStore extends Store> = Fn<TArgs, TStore>
 
@@ -19,24 +20,23 @@ export const createStore = <TStore extends Store, TArgs extends readonly unknown
   setupFn: StoreSetup<TArgs, TStore>,
   storeOptions?: StoreOptions
 ) => {
-  const id = Symbol(name)
-  const instances = new Map<string, TStore>()
+  const storeDefinitionId = Symbol(name)
 
   return (...mappedArgs: MapArgs<TArgs>) => {
-    const storeRef = computed(() => {
-      const args = mappedArgs.map(unref) as unknown as TArgs
-      const key = hash(args)
+    const storeProvider = useStoreProvider(storeOptions?.storeProvider)
 
-      if (instances.has(key)) {
-        return instances.get(key) as TStore
+    const args = computed(() => mappedArgs.map(unref) as unknown as TArgs)
+
+    storeProvider.registerDependency(name, storeDefinitionId, args)
+
+    const storeRef = computed(() => {
+      const key = hash(unref(args))
+
+      if (storeProvider.has(name, storeDefinitionId, key)) {
+        return storeProvider.get(name, storeDefinitionId, key) as TStore
       }
 
-      const storeId = Symbol(`${name}${key}`)
-      const store = setupFn(...args)
-
-      instances.set(key, store)
-
-      return store
+      return storeProvider.add(name, storeDefinitionId, key, () => setupFn(...unref(args)))
     })
 
     return createStoreProxy(name, storeRef)
@@ -45,7 +45,7 @@ export const createStore = <TStore extends Store, TArgs extends readonly unknown
 
 const createStoreProxy = <TStore extends Store>(
   name: StoreName,
-  store: ComputedRef<TStore>
+  store: Ref<TStore>
 ) => {
   const storeDefinition = unref(store)
 

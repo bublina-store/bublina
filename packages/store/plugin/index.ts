@@ -12,19 +12,19 @@ export type PluginOptions = {
 
 export default {
   install: (app: App, options: PluginOptions = { devtools: true }) => {
-    const contextProvider = options.storeProvider ?? createStoreProvider()
+    const storeProvider = options.storeProvider ?? createStoreProvider()
 
-    app.provide(__CONTEXT_PROVIDER_SYMBOL, contextProvider)
+    app.provide(__CONTEXT_PROVIDER_SYMBOL, storeProvider)
 
     if (options.devtools && (process.env.NODE_ENV === 'development' || __VUE_PROD_DEVTOOLS__)) {
-      setupDevtools(app, { contextProvider })
+      setupDevtools(app, { contextProvider: storeProvider })
     }
   }
 }
 
 export const useStoreProvider = (
-  contextProvider?: StoreProvider
+  storeProvider?: StoreProvider
 ) => {
-  return contextProvider
-    ?? inject<StoreProvider>(__CONTEXT_PROVIDER_SYMBOL)
+  return storeProvider
+    ?? inject<StoreProvider>(__CONTEXT_PROVIDER_SYMBOL) as StoreProvider
 }
