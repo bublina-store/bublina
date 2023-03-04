@@ -1,5 +1,6 @@
 ﻿import { Store, StoreName } from '../types'
 import hash from 'fast-json-stable-stringify'
+import { Ref } from 'vue'
 
 type StoreDefinitionId = symbol
 type StoreInstanceKey = string
@@ -11,6 +12,11 @@ type StoreInstance = {
 }
 
 type DependencyChangeCallback = () => void
+
+type StoreDefinitionOptions<TArgs extends readonly unknown[], TStore> = {
+  name: StoreName,
+  setupFn: (...args: TArgs) => TStore
+}
 
 export const createStoreProvider = () => {
   const instances = new Map<StoreId, StoreInstance>()
@@ -24,15 +30,15 @@ export const createStoreProvider = () => {
 
   let dependenciesChangedCallbacks: DependencyChangeCallback[] = []
 
-  const has = (name: StoreName, definitionId: StoreDefinitionId, key: StoreInstanceKey) => {
-    return instances.has(getStoreId(name, definitionId, key))
+  const has = (storeId: StoreId) => {
+    return instances.has(storeId)
   }
 
-  const get = <TStore extends Store>(name: StoreName, definitionId: StoreDefinitionId, key: StoreInstanceKey) => {
-    const instance = instances.get(getStoreId(name, definitionId, key))
+  const get = <TStore extends Store>(storeId: StoreId) => {
+    const instance = instances.get(storeId)
 
     if (!instance) {
-      throw new Error(`Store "${definitionId.toString()}${key}" was not found`)
+      throw new Error(`Store "${storeId.toString()}" was not found`)
     }
 
     return instance.store as TStore
@@ -41,7 +47,9 @@ export const createStoreProvider = () => {
   const add = <TStore extends Store>(name: StoreName, definitionId: StoreDefinitionId, key: StoreInstanceKey, storeFn: () => TStore) => {
     const previousContext = storeContext
 
-    storeContext = getStoreId(name, definitionId, key)
+    const storeId = getStoreId(name, definitionId, key)
+
+    storeContext = storeId
 
     const scope = effectScope()
 
@@ -143,17 +151,43 @@ export const createStoreProvider = () => {
     }
   }
 
+  const useStoreDefinition = <TArgs extends readonly unknown[], TStore extends Store>(
+    storeDefinitionId: StoreDefinitionId,
+    options: StoreDefinitionOptions<TArgs, TStore>
+  ) => {
+    const _get = (args: Ref<TArgs>) => {
+      registerDependency(options.name, storeDefinitionId, args)
+
+      return computed(() => {
+        const key = hash(unref(args))
+        const storeId = getStoreId(options.name, storeDefinitionId, key)
+
+        if (has(storeId)) {
+          return get(storeId) as TStore
+        }
+
+        return add(options.name, storeDefinitionId, key, () => options.setupFn(...unref(args)))
+      })
+    }
+
+    return {
+      get: _get
+    }
+  }
+
   return {
-    has,
-    get,
-    add,
-    remove,
-    registerDependency,
+    // has,
+    // get,
+    // add,
+    // remove,
+    // registerDependency,
     instances,
     dependencies,
     dependants,
     storeIds,
-    onDependenciesChanged
+    onDependenciesChanged,
+
+    useStoreDefinition
   }
 }
 

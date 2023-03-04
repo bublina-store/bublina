@@ -22,9 +22,4 @@ export default {
   }
 }
 
-export const useStoreProvider = (
-  storeProvider?: StoreProvider
-) => {
-  return storeProvider
-    ?? inject<StoreProvider>(__CONTEXT_PROVIDER_SYMBOL) as StoreProvider
-}
+export const useStoreProvider = () => inject(__CONTEXT_PROVIDER_SYMBOL) as StoreProvider
