@@ -30,24 +30,8 @@ export const createStoreProvider = () => {
 
   let dependenciesChangedCallbacks: DependencyChangeCallback[] = []
 
-  const has = (storeId: StoreId) => {
-    return instances.has(storeId)
-  }
-
-  const get = <TStore extends Store>(storeId: StoreId) => {
-    const instance = instances.get(storeId)
-
-    if (!instance) {
-      throw new Error(`Store "${storeId.toString()}" was not found`)
-    }
-
-    return instance.store as TStore
-  }
-
-  const add = <TStore extends Store>(name: StoreName, definitionId: StoreDefinitionId, key: StoreInstanceKey, storeFn: () => TStore) => {
+  const add = <TStore extends Store>(storeId: StoreId, definitionId: StoreDefinitionId, key: StoreInstanceKey, storeFn: () => TStore) => {
     const previousContext = storeContext
-
-    const storeId = getStoreId(name, definitionId, key)
 
     storeContext = storeId
 
@@ -75,33 +59,7 @@ export const createStoreProvider = () => {
       removeDependency(id, to)
     })
 
-    dependencies.delete(id)
-    dependants.delete(id)
-
     storeIds.get(instance.definitionId)?.delete(instance.key)
-  }
-
-  const registerDependency = (name: StoreName, definitionId: StoreDefinitionId, args: Ref<readonly unknown[]>) => {
-    const key = hash(unref(args))
-    const previousContext = storeContext
-
-    let storeId = getStoreId(name, definitionId, key)
-
-    addDependency(previousContext, storeId)
-
-    onScopeDispose(() => {
-      removeDependency(previousContext, storeId)
-    })
-
-    watch(args, (newArgs, oldArgs) => {
-      const oldStoreId = getStoreId(name, definitionId, hash(oldArgs))
-      const newStoreId = getStoreId(name, definitionId, hash(newArgs))
-
-      addDependency(previousContext, newStoreId)
-      removeDependency(previousContext, oldStoreId)
-
-      storeId = newStoreId
-    })
   }
 
   const removeDependency = (from: StoreId, to: StoreId) => {
@@ -115,8 +73,14 @@ export const createStoreProvider = () => {
     dependantsTo?.splice(oldDependantIndex as number, 1)
 
     if (dependantsTo?.length === 0) {
+      dependants.delete(to)
+
       // TODO: Properly handle removal
-      // remove(to)
+      remove(to)
+    }
+
+    if (dependenciesFrom?.length === 0) {
+      dependencies.delete(from)
     }
 
     dependenciesChangedCallbacks.forEach(callback => callback())
@@ -127,21 +91,6 @@ export const createStoreProvider = () => {
     dependants.set(to, [...dependants.get(to) ?? [], from])
 
     dependenciesChangedCallbacks.forEach(callback => callback())
-  }
-
-  const getStoreId = (name: StoreName, definitionId: StoreDefinitionId, key: StoreInstanceKey) => {
-    if (!storeIds.has(definitionId)) {
-      storeIds.set(definitionId, new Map<StoreInstanceKey, StoreId>())
-    }
-
-    const i = storeIds.get(definitionId) as Map<StoreInstanceKey, StoreId>
-
-    if (!i.has(key)) {
-      const storeId = Symbol(`${name}${key}`)
-      i.set(key, storeId)
-    }
-
-    return storeIds.get(definitionId)?.get(key) as StoreId
   }
 
   const onDependenciesChanged = (callbackFn: DependencyChangeCallback) => {
@@ -155,32 +104,63 @@ export const createStoreProvider = () => {
     storeDefinitionId: StoreDefinitionId,
     options: StoreDefinitionOptions<TArgs, TStore>
   ) => {
-    const _get = (args: Ref<TArgs>) => {
-      registerDependency(options.name, storeDefinitionId, args)
+    const getStoreId = (key: StoreInstanceKey) => {
+      if (!storeIds.has(storeDefinitionId)) {
+        storeIds.set(storeDefinitionId, new Map<StoreInstanceKey, StoreId>())
+      }
+
+      const i = storeIds.get(storeDefinitionId) as Map<StoreInstanceKey, StoreId>
+
+      if (!i.has(key)) {
+        const storeId = Symbol(`${name}${key}`)
+        i.set(key, storeId)
+      }
+
+      return storeIds.get(storeDefinitionId)?.get(key) as StoreId
+    }
+
+    const registerDependency = (args: Ref<readonly unknown[]>) => {
+      const previousContext = storeContext
+
+      onScopeDispose(() => {
+        const storeId = storeIds.get(storeDefinitionId)?.get(hash(unref(args))) as StoreId
+        removeDependency(previousContext, storeId)
+      })
+
+      watch(args, (newArgs, oldArgs) => {
+        const newStoreId = getStoreId(hash(newArgs))
+        addDependency(previousContext, newStoreId)
+
+        if (!oldArgs) {
+          return
+        }
+
+        const oldStoreId = getStoreId(hash(oldArgs))
+        removeDependency(previousContext, oldStoreId)
+      }, { immediate: true })
+    }
+
+    const get = (args: Ref<TArgs>) => {
+      registerDependency(args)
 
       return computed(() => {
         const key = hash(unref(args))
-        const storeId = getStoreId(options.name, storeDefinitionId, key)
+        const storeId = getStoreId(key)
 
-        if (has(storeId)) {
-          return get(storeId) as TStore
+        if (instances.has(storeId)) {
+          return instances.get(storeId)?.store as TStore
         }
 
-        return add(options.name, storeDefinitionId, key, () => options.setupFn(...unref(args)))
+        return add(storeId, storeDefinitionId, key, () => options.setupFn(...unref(args)))
       })
     }
 
     return {
-      get: _get
+      get
     }
   }
 
   return {
-    // has,
-    // get,
-    // add,
-    // remove,
-    // registerDependency,
     instances,
     dependencies,
     dependants,
