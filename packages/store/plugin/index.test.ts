@@ -4,21 +4,21 @@ describe('plugin', () => {
   describe('when contextProvider is passed in options', () => {
     describe('useContextProvider', () => {
       it('return provider passed in options', () => {
-        const contextProvider = createStoreProvider()
+        const storeProvider = createStoreProvider()
 
         mount(() => {
           const componentContextProvider = useStoreProvider()
 
-          expect(componentContextProvider).toBe(contextProvider)
+          expect(componentContextProvider).toBe(storeProvider)
         }, {
           global: {
-            plugins: [(app) => app.use(plugin, { contextProvider, devtools: false })]
+            plugins: [(app) => app.use(plugin, { storeProvider, devtools: false })]
           }
         })
       })
 
       it('always returns the same provider', () => {
-        const contextProvider = createStoreProvider()
+        const storeProvider = createStoreProvider()
 
         mount(() => {
           const componentContextProvider1 = useStoreProvider()
@@ -27,7 +27,7 @@ describe('plugin', () => {
           expect(componentContextProvider1).toBe(componentContextProvider2)
         }, {
           global: {
-            plugins: [(app) => app.use(plugin, { contextProvider, devtools: false })]
+            plugins: [(app) => app.use(plugin, { storeProvider, devtools: false })]
           }
         })
       })

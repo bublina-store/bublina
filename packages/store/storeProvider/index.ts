@@ -16,7 +16,7 @@ type CreateStoreProviderOptions = {
   cacheTime?: number
 }
 
-export const createStoreProvider = (providerOptions: CreateStoreProviderOptions) => {
+export const createStoreProvider = (providerOptions?: CreateStoreProviderOptions) => {
   const componentContext = Symbol('Component')
 
   const instances = new Map<StoreId, StoreInstance>()
