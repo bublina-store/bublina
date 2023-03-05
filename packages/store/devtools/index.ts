@@ -8,7 +8,14 @@ type SetupDevtoolsOptions = {
 
 const storeInspectorId = '@bublina/store:inspector'
 
-const prettyPrint = (store: string, key: string) => `${store}(${key.substring(1, key.length - 1)})`
+const colors = {
+  dependencies: { textColor: 0xffffff, backgroundColor: 0x2563eb },
+  dependants: { textColor: 0xffffff, backgroundColor: 0x65a30d },
+  ref: { textColor: 0x000000, backgroundColor: 0xfde68a },
+  stores: { textColor: 0xffffff, backgroundColor: 0x9d174d }
+}
+
+const pluralize = (count: number, singular: string, plural: string) => count === 1 ? singular : plural
 
 export const setupDevtools = (app: App, { contextProvider }: SetupDevtoolsOptions) => {
   setupDevtoolsPlugin({
@@ -22,7 +29,15 @@ export const setupDevtools = (app: App, { contextProvider }: SetupDevtoolsOption
       icon: 'bubble_chart'
     })
 
-    contextProvider.onDependenciesChanged(() => {
+    type StoreDefinition = ReturnType<typeof contextProvider.getStoreDefinitions>[number]
+    type StoreInstance = ReturnType<StoreDefinition['getInstances']>[number]
+
+    const storeMap = uniqueMap<StoreDefinition>()
+    const instanceMap = uniqueMap<StoreInstance>()
+
+    let clearWatcher: () => void
+
+    contextProvider.on.dependenciesChanged(() => {
       api.sendInspectorTree(storeInspectorId)
       api.sendInspectorState(storeInspectorId)
     })
@@ -32,88 +47,131 @@ export const setupDevtools = (app: App, { contextProvider }: SetupDevtoolsOption
         return
       }
 
-      payload.rootNodes = [...contextProvider.storeDefinitions.entries()].map(([storeDefinitionId, storeDefinition]) => ({
-        id: storeDefinitionId.toString(),
-        label: storeDefinitionId.toString(),
-        children: storeDefinition.entries().map(([_, storeId]) => {
-          const instance = contextProvider.instances.get(storeId)
+      storeMap.clear()
+      instanceMap.clear()
 
-          return {
-            id: storeId.toString(),
-            label: storeId.toString(),
-            tags: [
-              contextProvider.dependencies.get(storeId)?.length && { label: `Dependencies: ${contextProvider.dependencies.get(storeId)?.length}`, textColor: 0xffffff, backgroundColor: 0x0342ab },
-              contextProvider.dependants.get(storeId)?.length && { label: `Dependants: ${contextProvider.dependants.get(storeId)?.length}`, textColor: 0xffffff, backgroundColor: 0xab0342 }
-            ].filter(Boolean) as []
-          }
-        })
-      }))
+      payload.rootNodes = contextProvider.getStoreDefinitions().map(storeDefinition => {
+        const instances = storeDefinition.getInstances()
 
-      // .map(([context]) => ({
-      //     id: JSON.stringify({ type: 'store', storeName: context.name }),
-      //     label: context.name,
-      //     tags: [],
-      //     children: context.entries().map(([instanceKey, instance]) => ({
-      //       id: JSON.stringify({ type: 'instance', storeName: context.name, instanceName: instanceKey }),
-      //       label: prettyPrint(context.name, instanceKey),
-      //       tags: [
-      //         // { label: `Components: ${instance.referencedComponentsCount}`, textColor: 0xffffff, backgroundColor: 0x4203ab },
-      //         { label: `Dependencies: ${contextProvider.dependencyTracker.getDependencies(instance).length}`, textColor: 0xffffff, backgroundColor: 0x0342ab },
-      //         { label: `Dependants: ${contextProvider.dependencyTracker.getDependents(instance).length}`, textColor: 0xffffff, backgroundColor: 0xab0342 }
-      //       ]
-      //     }))
-      //   }))
+        return {
+          id: storeMap.add(storeDefinition.name, storeDefinition),
+          label: storeDefinition.name,
+          tags: [
+            instances.length && { label: `${instances.length} instances`, ...colors.stores }
+          ].filter(Boolean) as [],
+          children: instances.map(store => {
+            const dependencies = store.dependencies.length
+            const dependants = store.dependants.length
+
+            return {
+              id: instanceMap.add(`${storeDefinition.name}(${store.key})`, store),
+              label: `${storeDefinition.name}(${store.key})`,
+              tags: [
+                isRef(store.store) && { label: 'Ref', ...colors.ref },
+                store.dependencies.length && { label: `${dependencies} ${pluralize(dependencies, 'dependency', 'dependencies')}`, ...colors.dependencies },
+                store.dependants.length && { label: `${dependants} ${pluralize(dependants, 'dependant', 'dependants')}`, ...colors.dependants }
+              ].filter(Boolean) as []
+            }
+          })
+        }
+      })
     })
 
-    // api.on.getInspectorState((payload) => {
-    //   if (payload.inspectorId !== storeInspectorId) {
-    //     return
-    //   }
-    //
-    //   const { type, storeName, instanceName } = JSON.parse(payload.nodeId)
-    //
-    //   const context = contextProvider.getContext(storeName)
-    //   const instance = context?.entries().find(([name]) => name === instanceName)?.[1]
-    //
-    //   switch (type) {
-    //     case 'store':
-    //       payload.state = {
-    //         '': [
-    //           { key: 'Setup', value: storeName }
-    //         ]
-    //       }
-    //       break
-    //     case 'instance':
-    //       payload.state = {
-    //         ' Values': Object
-    //           .entries(instance.store)
-    //           .filter(([, value]) => isRef(value))
-    //           .map(([key, value]) => ({
-    //             key,
-    //             value: unref(value),
-    //             objectType: 'ref'
-    //           })),
-    //         Actions: Object
-    //           .entries(instance.store)
-    //           .filter(([, value]) => typeof value === 'function')
-    //           .map(([key, value]) => ({
-    //             key,
-    //             value,
-    //             objectType: 'other'
-    //           })),
-    //         Parameters: (JSON.parse(instanceName) as unknown[]).map((value, index) => ({
-    //           key: index.toString(),
-    //           value
-    //         })),
-    //         Dependencies: instance.dependencyTracker.dependencies
-    //           .map((dependency, key) => ({
-    //             key: key.toString(),
-    //             value: `${dependency.name}(${dependency.key.substring(1, dependency.key.length - 1)})`,
-    //             objectType: 'other'
-    //           }))
-    //       }
-    //       break
-    //   }
-    // })
+    api.on.getInspectorState((payload) => {
+      clearWatcher?.()
+
+      if (payload.inspectorId !== storeInspectorId) {
+        return
+      }
+
+      const storeDefinition = storeMap.get(payload.nodeId)
+      if (storeDefinition) {
+        payload.state = {
+          Options: [
+            { key: 'Name', value: storeDefinition.name }
+          ]
+        }
+        return
+      }
+
+      const instance = instanceMap.get(payload.nodeId)
+      if (instance) {
+        const dependencies = instance.dependencies
+        const dependants = instance.dependants
+
+        const storeEntries = Object.entries(instance.store)
+        const refs = storeEntries.filter(([, value]) => isRef(value))
+        const actions = storeEntries.filter(([, value]) => typeof value === 'function')
+
+        clearWatcher = isRef(instance.store)
+          ? watch(instance.store, () => {
+            api.sendInspectorState(storeInspectorId)
+          })
+          : watch(refs.map(([, value]) => value), () => {
+            api.sendInspectorState(storeInspectorId)
+          })
+
+        const exposed = isRef(instance.store)
+          ? {
+              '  Exposed Ref': [{
+                key: 'value',
+                value: unref(instance.store),
+                objectType: 'ref' as const
+              }]
+            }
+          : {
+              [`  Exposed Refs (${refs.length})`]: refs.map(([key, value]) => ({
+                key,
+                value: unref(value),
+                objectType: 'ref' as const
+              })),
+              [` Exposed Actions (${actions.length})`]: actions.map(([key, value]) => ({
+                key,
+                value,
+                objectType: 'other' as const
+              }))
+            }
+
+        payload.state = {
+          ...exposed,
+          Arguments: instance.getArguments().map((argument, i) => ({
+            key: i.toString(),
+            value: argument
+          })),
+          [`Dependencies (${dependencies.length})`]: dependencies.map((dependency, i) => ({
+            key: i.toString(),
+            value: dependency
+          })),
+          [`Dependants (${dependants.length})`]: dependants.map((dependant, i) => ({
+            key: i.toString(),
+            value: dependant
+          }))
+        }
+      }
+    })
   })
+}
+
+const uniqueMap = <TValue = unknown>() => {
+  const map = new Map<string, TValue>()
+
+  const add = (key: string, value: TValue) => {
+    if (!map.has(key)) {
+      map.set(key, value)
+      return key
+    }
+
+    let index = 0
+    while (map.has(`${key}(${index})`)) {
+      index++
+    }
+    map.set(`${key}(${index})`, value)
+    return `${key}(${index})`
+  }
+
+  return {
+    get: (key: string) => map.get(key) as TValue,
+    clear: () => map.clear(),
+    add
+  }
 }

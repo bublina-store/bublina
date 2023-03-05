@@ -53,13 +53,9 @@ export const createStoreProvider = () => {
   }
 
   return {
-    // TODO: Replace this with proper listing
-    instances,
-    dependencies: dependencyTracker.dependencies,
-    dependants: dependencyTracker.dependants,
-    storeDefinitions,
-    onDependenciesChanged: dependencyTracker.on.dependenciesChanged,
-
+    on: {
+      dependenciesChanged: dependencyTracker.on.dependenciesChanged
+    },
     getStoreDefinitions,
     useStoreDefinition
   }

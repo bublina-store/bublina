@@ -92,11 +92,11 @@ export const createStoreDefinition = <TArgs extends readonly unknown[], TStore e
     })
   }
 
-  const getStores = () => {
+  const getInstances = () => {
     return [...storeIds.entries()].map(([key, storeId]) => {
       return {
         key,
-        getArguments: () => JSON.parse(key),
+        getArguments: () => JSON.parse(key) as TArgs,
         store: getInstance(storeId)?.store,
         dependencies: dependencyTracker.dependencies.get(storeId) || [],
         dependants: dependencyTracker.dependants.get(storeId) || []
@@ -105,11 +105,8 @@ export const createStoreDefinition = <TArgs extends readonly unknown[], TStore e
   }
 
   return {
-    // TODO: Replace this with proper listing
-    entries: () => [...storeIds.entries()],
-
     name,
-    getStores,
+    getInstances,
     getStore
   }
 }
