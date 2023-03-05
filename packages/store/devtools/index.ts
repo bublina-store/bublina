@@ -8,11 +8,17 @@ type SetupDevtoolsOptions = {
 
 const storeInspectorId = '@bublina/store:inspector'
 
-const colors = {
+const storeTagColors = {
+  active: { textColor: 0xffffff, backgroundColor: 0x2563eb },
+  cached: { textColor: 0x000000, backgroundColor: 0x9ca3af },
+  stores: { textColor: 0xffffff, backgroundColor: 0x9d174d }
+}
+
+const instanceTagColors = {
   dependencies: { textColor: 0xffffff, backgroundColor: 0x2563eb },
   dependants: { textColor: 0xffffff, backgroundColor: 0x65a30d },
-  ref: { textColor: 0x000000, backgroundColor: 0xfde68a },
-  stores: { textColor: 0xffffff, backgroundColor: 0x9d174d }
+  cached: { textColor: 0x000000, backgroundColor: 0x9ca3af },
+  ref: { textColor: 0x000000, backgroundColor: 0xfde68a }
 }
 
 const pluralize = (count: number, singular: string, plural: string) => count === 1 ? singular : plural
@@ -37,7 +43,7 @@ export const setupDevtools = (app: App, { contextProvider }: SetupDevtoolsOption
 
     let clearWatcher: () => void
 
-    contextProvider.on.dependenciesChanged(() => {
+    contextProvider.on.changed(() => {
       api.sendInspectorTree(storeInspectorId)
       api.sendInspectorState(storeInspectorId)
     })
@@ -53,11 +59,15 @@ export const setupDevtools = (app: App, { contextProvider }: SetupDevtoolsOption
       payload.rootNodes = contextProvider.getStoreDefinitions().map(storeDefinition => {
         const instances = storeDefinition.getInstances()
 
+        const active = instances.filter(instance => instance.dependants.length).length
+        const cached = instances.length - active
+
         return {
           id: storeMap.add(storeDefinition.name, storeDefinition),
           label: storeDefinition.name,
           tags: [
-            instances.length && { label: `${instances.length} instances`, ...colors.stores }
+            active && { label: `${active} active`, ...storeTagColors.active },
+            cached && { label: `${cached} cached`, ...storeTagColors.cached }
           ].filter(Boolean) as [],
           children: instances.map(store => {
             const dependencies = store.dependencies.length
@@ -67,9 +77,11 @@ export const setupDevtools = (app: App, { contextProvider }: SetupDevtoolsOption
               id: instanceMap.add(`${storeDefinition.name}(${store.key})`, store),
               label: `${storeDefinition.name}(${store.key})`,
               tags: [
-                isRef(store.store) && { label: 'Ref', ...colors.ref },
-                store.dependencies.length && { label: `${dependencies} ${pluralize(dependencies, 'dependency', 'dependencies')}`, ...colors.dependencies },
-                store.dependants.length && { label: `${dependants} ${pluralize(dependants, 'dependant', 'dependants')}`, ...colors.dependants }
+                isRef(store.store) && { label: 'Ref', ...instanceTagColors.ref },
+                store.dependencies.length && { label: `${dependencies} ${pluralize(dependencies, 'dependency', 'dependencies')}`, ...instanceTagColors.dependencies },
+                store.dependants.length
+                  ? { label: `${dependants} ${pluralize(dependants, 'dependant', 'dependants')}`, ...instanceTagColors.dependants }
+                  : { label: 'Cached', ...instanceTagColors.cached }
               ].filter(Boolean) as []
             }
           })
@@ -88,7 +100,8 @@ export const setupDevtools = (app: App, { contextProvider }: SetupDevtoolsOption
       if (storeDefinition) {
         payload.state = {
           Options: [
-            { key: 'Name', value: storeDefinition.name }
+            { key: 'Name', value: storeDefinition.name },
+            { key: 'Cache Time', value: storeDefinition.cacheTime ?? Infinity }
           ]
         }
         return

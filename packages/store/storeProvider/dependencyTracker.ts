@@ -45,6 +45,8 @@ export const createDependencyTracker = <T>(defaultDependency: T) => {
     dependenciesFrom.forEach(to => {
       removeDependency(from, to)
     })
+
+    dependenciesChanged.dispatch()
   }
 
   const withCurrentDependency = <TResult>(dependency: T, fn: () => TResult) => {

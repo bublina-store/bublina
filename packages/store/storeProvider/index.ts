@@ -2,20 +2,28 @@
 import type { CreateStoreDefinitionOptions, StoreId, StoreInstance } from './storeDefinition'
 import { createDependencyTracker } from './dependencyTracker'
 import { createStoreDefinition } from './storeDefinition'
+import { createEvent } from '../utilities/createEvent'
 
 type StoreDefinitionId = symbol
 
 type StoreDefinitionOptions<TArgs extends readonly unknown[], TStore> = {
   name: StoreName,
-  setupFn: (...args: TArgs) => TStore
+  setupFn: (...args: TArgs) => TStore,
+  cacheTime?: number
 }
 
-export const createStoreProvider = () => {
+type CreateStoreProviderOptions = {
+  cacheTime?: number
+}
+
+export const createStoreProvider = (providerOptions: CreateStoreProviderOptions) => {
   const componentContext = Symbol('Component')
 
   const instances = new Map<StoreId, StoreInstance>()
   const storeDefinitions = new Map<StoreDefinitionId, unknown>()
   const dependencyTracker = createDependencyTracker<StoreId>(componentContext)
+
+  const changedEvent = createEvent()
 
   const createStoreDefinitionOptions: CreateStoreDefinitionOptions = {
     dependencyTracker,
@@ -26,6 +34,7 @@ export const createStoreProvider = () => {
   }
 
   dependencyTracker.on.emptyDependants((id) => { handleEmptyDependants(id) })
+  dependencyTracker.on.dependenciesChanged(() => changedEvent.dispatch())
 
   const handleEmptyDependants = (id: StoreId) => {
     instances.get(id)?.onRemoved()
@@ -39,6 +48,9 @@ export const createStoreProvider = () => {
       const definition = createStoreDefinition(
         options.name,
         options.setupFn,
+        {
+          cacheTime: options.cacheTime ?? providerOptions?.cacheTime
+        },
         createStoreDefinitionOptions
       )
 
@@ -54,7 +66,7 @@ export const createStoreProvider = () => {
 
   return {
     on: {
-      dependenciesChanged: dependencyTracker.on.dependenciesChanged
+      changed: changedEvent.on
     },
     getStoreDefinitions,
     useStoreDefinition

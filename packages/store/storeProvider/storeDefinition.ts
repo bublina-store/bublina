@@ -20,9 +20,16 @@ export type CreateStoreDefinitionOptions = {
   deleteInstance: (id: StoreId) => void
 }
 
+export type StoreDefinitionOptions = {
+  cacheTime?: number
+}
+
 export const createStoreDefinition = <TArgs extends readonly unknown[], TStore extends Store>(
   name: StoreName,
   setupFn: (...args: TArgs) => TStore,
+  {
+    cacheTime
+  }: StoreDefinitionOptions,
   {
     dependencyTracker,
     hasInstance,
@@ -32,6 +39,7 @@ export const createStoreDefinition = <TArgs extends readonly unknown[], TStore e
   }: CreateStoreDefinitionOptions
 ) => {
   const storeIds = new Map<StoreInstanceKey, StoreId>()
+  const timers = new Map<StoreId, ReturnType<typeof setTimeout>>()
 
   const getStoreId = (key: StoreInstanceKey) => {
     if (!storeIds.has(key)) {
@@ -70,6 +78,7 @@ export const createStoreDefinition = <TArgs extends readonly unknown[], TStore e
       const storeId = getStoreId(key)
 
       if (hasInstance(storeId)) {
+        clearTimeout(timers.get(storeId))
         return getInstance(storeId)?.store as TStore
       }
 
@@ -82,9 +91,18 @@ export const createStoreDefinition = <TArgs extends readonly unknown[], TStore e
       setInstance(storeId, {
         store,
         onRemoved: () => {
-          storeIds.delete(key)
-          dependencyTracker.removeAllDependencies(storeId)
-          deleteInstance(storeId)
+          if (!cacheTime || cacheTime === Infinity) {
+            return
+          }
+
+          const timeout = setTimeout(() => {
+            storeIds.delete(key)
+            dependencyTracker.removeAllDependencies(storeId)
+            deleteInstance(storeId)
+            timers.delete(storeId)
+          }, cacheTime)
+
+          timers.set(storeId, timeout)
         }
       })
 
@@ -106,6 +124,7 @@ export const createStoreDefinition = <TArgs extends readonly unknown[], TStore e
 
   return {
     name,
+    cacheTime,
     getInstances,
     getStore
   }

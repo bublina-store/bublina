@@ -7,12 +7,22 @@ const __CONTEXT_PROVIDER_SYMBOL = Symbol('contextProvider')
 
 export type PluginOptions = {
   storeProvider?: StoreProvider,
-  devtools?: boolean
+  devtools?: boolean,
+  cacheTime?: number
+}
+
+const defaultOptions = {
+  devtools: true
 }
 
 export default {
-  install: (app: App, options: PluginOptions = { devtools: true }) => {
-    const storeProvider = options.storeProvider ?? createStoreProvider()
+  install: (app: App, pluginOptions?: PluginOptions) => {
+    const options = {
+      ...defaultOptions,
+      ...pluginOptions
+    }
+
+    const storeProvider = options.storeProvider ?? createStoreProvider({ cacheTime: options.cacheTime })
 
     app.provide(__CONTEXT_PROVIDER_SYMBOL, storeProvider)
 

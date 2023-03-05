@@ -17,7 +17,7 @@ const router = createRouter({
   routes
 })
 
-app.use(Bublina)
+app.use(Bublina, { cacheTime: 2500 })
 app.use(router)
 
 app.mount('#app')

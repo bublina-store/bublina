@@ -11,7 +11,8 @@ type MapArgs<TArgs extends readonly unknown[]> = {
 }
 
 type StoreOptions = {
-  storeProvider?: StoreProvider
+  storeProvider?: StoreProvider,
+  cacheTime?: number
 }
 
 export const createStore = <TStore extends Store, TArgs extends readonly unknown[]>(
@@ -23,7 +24,8 @@ export const createStore = <TStore extends Store, TArgs extends readonly unknown
 
   const storeDefinitionOptions = {
     name,
-    setupFn
+    setupFn,
+    cacheTime: storeOptions?.cacheTime
   }
 
   return (...mappedArgs: MapArgs<TArgs>) => {
