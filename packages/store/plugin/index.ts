@@ -3,7 +3,7 @@ import type { StoreProvider } from '../storeProvider'
 import { createStoreProvider } from '../storeProvider'
 import { setupDevtools } from '../devtools'
 
-const __CONTEXT_PROVIDER_SYMBOL = Symbol('contextProvider')
+const __STORE_PROVIDER_SYMBOL = Symbol('storeProvider')
 
 export type PluginOptions = {
   storeProvider?: StoreProvider,
@@ -24,7 +24,7 @@ export default {
 
     const storeProvider = options.storeProvider ?? createStoreProvider({ cacheTime: options.cacheTime })
 
-    app.provide(__CONTEXT_PROVIDER_SYMBOL, storeProvider)
+    app.provide(__STORE_PROVIDER_SYMBOL, storeProvider)
 
     if (options.devtools && (process.env.NODE_ENV === 'development' || __VUE_PROD_DEVTOOLS__)) {
       setupDevtools(app, { contextProvider: storeProvider })
@@ -32,4 +32,4 @@ export default {
   }
 }
 
-export const useStoreProvider = () => inject(__CONTEXT_PROVIDER_SYMBOL) as StoreProvider
+export const useStoreProvider = () => inject(__STORE_PROVIDER_SYMBOL) as StoreProvider

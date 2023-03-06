@@ -1,13 +1,19 @@
 {
   "name": "bublina",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Tomas Durica",
   "license": "ISC",
   "description": "",
   "keywords": [],
   "scripts": {
-    "test": "vitest"
+    "test": "vitest --run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint --ext .ts --ignore-pattern packages/playground .",
+    "build": "npx tsx scripts/build.ts",
+    "clean": "npx tsx scripts/clean.ts",
+    "publish": "npx tsx scripts/publish.ts",
+    "release": "npx tsx scripts/release.ts"
   },
   "devDependencies": {
     "@bublina/store": "workspace:*",

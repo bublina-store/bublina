@@ -1,4 +1,4 @@
-﻿import type { Ref } from 'vue'
+import type { Ref } from 'vue'
 import type { Fn, Store, StoreName } from '../types'
 import { StoreProvider } from '../storeProvider'
 import { useStoreProvider } from '../plugin'

@@ -1,14 +1,13 @@
-import { createStore } from '@bublina/store'
+import { createStore, createStoreProvider } from '@bublina/store'
 import { Ref } from 'vue'
 import { Fn, Store } from '../types'
 
 describe('createStore', () => {
   test('dev', () => {
     const useTestStore = createTestStore('test', (name: string) => {
-      const value = ref(0)
-
       return {
-        value
+        name: ref(name),
+        value: ref(0)
       }
     })
 
@@ -26,10 +25,9 @@ describe('createStore', () => {
 
   test('dev', () => {
     const useTestStore = createTestStore('test', (name: string) => {
-      const value = ref(0)
-
       return {
-        value
+        name: ref(name),
+        value: ref(0)
       }
     })
 
@@ -47,10 +45,9 @@ describe('createStore', () => {
 
   test('dev', () => {
     const useTestStore = createTestStore('test', (name: string) => {
-      const value = ref(0)
-
       return {
-        value
+        name: ref(name),
+        value: ref(0)
       }
     })
 
@@ -87,8 +84,8 @@ describe('createStore', () => {
     describe('returned function', () => {
       describe('when setupFn is without parameters', () => {
         it('should not require parameters', () => {
-          expectTypeOf(createStore('ref', () => ref())).toMatchTypeOf<() => unknown>()
-          expectTypeOf(createStore('state and actions', () => ({}))).toMatchTypeOf<() => unknown>()
+          expectTypeOf(createTestStore('ref', () => ref())).toMatchTypeOf<() => unknown>()
+          expectTypeOf(createTestStore('state and actions', () => ({}))).toMatchTypeOf<() => unknown>()
         })
       })
 
@@ -97,9 +94,11 @@ describe('createStore', () => {
           type A = 'a'
           type B = 'b'
 
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           expectTypeOf(createStore('that returns ref', (a: A, b: B) => ref()))
             .toMatchTypeOf<(a: A | Ref<A>, b: B | Ref<B>) => unknown>()
 
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           expectTypeOf(createStore('that returns state and actions', (a: A, b: B) => ({})))
             .toMatchTypeOf<(a: A | Ref<A>, b: B | Ref<B>) => unknown>()
         })
@@ -114,6 +113,7 @@ describe('createStore', () => {
           expectTypeOf(createStore('without parameters', () => ref('result' as Result)))
             .toMatchTypeOf<() => Ref<Result>>()
 
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           expectTypeOf(createStore('with parameters', (a: A, b: B) => ref('result' as Result)))
             .toMatchTypeOf<(a: A | Ref<A>, b: B | Ref<B>) => Ref<Result>>()
         })
@@ -134,6 +134,7 @@ describe('createStore', () => {
           expectTypeOf(createStore('without parameters', () => store))
             .toMatchTypeOf<() => typeof store>()
 
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           expectTypeOf(createStore('with parameters', (a: A, b: B) => store))
             .toMatchTypeOf<(a: A | Ref<A>, b: B | Ref<B>) => typeof store>()
         })
@@ -143,5 +144,6 @@ describe('createStore', () => {
 })
 
 const createTestStore = <TStore extends Store, TArgs extends unknown[]>(name: string, setupFn: Fn<TArgs, TStore>) => {
-  return createStore<TStore, TArgs>(name, setupFn)
+  const storeProvider = createStoreProvider()
+  return createStore<TStore, TArgs>(name, setupFn, { storeProvider })
 }

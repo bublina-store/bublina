@@ -1,10 +1,13 @@
 {
-  "name": "@bublina/store",
+  "name": "@bublina/docs",
   "version": "0.2.0",
   "author": "Tomas Durica",
   "license": "ISC",
   "description": "",
   "keywords": [],
+  "scripts": {
+    "dev": "vitepress dev"
+  },
   "module": "./index.mjs",
   "types": "./index.d.mts",
   "exports": {
@@ -14,14 +17,8 @@
     },
     "./*": "./*"
   },
-  "dependencies": {
-    "@vue/devtools-api": "^6.5.0",
-    "fast-json-stable-stringify": "^2.1.0"
-  },
-  "peerDependencies": {
-    "vue": ">=3.0.0"
-  },
   "devDependencies": {
+    "vitepress": "1.0.0-alpha.49",
     "vue": "^3.2.47"
   }
 }

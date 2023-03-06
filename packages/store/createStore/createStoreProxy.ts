@@ -1,5 +1,5 @@
-import { Fn, Store, StoreName } from '../types'
-import { Ref } from 'vue'
+import type { Fn, Store } from '../types'
+import type { Ref } from 'vue'
 import { mapObjectValues } from '../utilities/mapObjectValues'
 
 export const createStoreProxy = <TStore extends Store>(

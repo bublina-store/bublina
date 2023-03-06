@@ -1,4 +1,4 @@
-﻿import type { Store, StoreName } from '../types'
+import type { Store, StoreName } from '../types'
 import type { CreateStoreDefinitionOptions, StoreId, StoreInstance } from './storeDefinition'
 import { createDependencyTracker } from './dependencyTracker'
 import { createStoreDefinition } from './storeDefinition'
