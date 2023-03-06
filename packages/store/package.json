@@ -1,10 +1,17 @@
 {
   "name": "@bublina/store",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "Tomas Durica",
   "license": "ISC",
   "description": "Composition-first vue state management",
-  "keywords": ["vue", "state", "management", "store", "typescript", "composition"],
+  "keywords": [
+    "vue",
+    "state",
+    "management",
+    "store",
+    "typescript",
+    "composition"
+  ],
   "module": "./index.mjs",
   "types": "./index.d.mts",
   "exports": {
