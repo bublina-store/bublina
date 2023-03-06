@@ -3,8 +3,8 @@
   "version": "0.2.0",
   "author": "Tomas Durica",
   "license": "ISC",
-  "description": "",
-  "keywords": [],
+  "description": "Composition-first vue state management",
+  "keywords": ["vue", "state", "management", "store", "typescript", "composition"],
   "module": "./index.mjs",
   "types": "./index.d.mts",
   "exports": {

@@ -54,7 +54,7 @@ const adjustPackageJson = async (pkg: Pkg) => {
   const adjustedPackageJson = {
     ...packageJson,
     dependencies: mapObjectValues(
-      packageJson.dependencies,
+      packageJson.dependencies ?? {},
       (dependencyVersion) => dependencyVersion === 'workspace:*' ? version : dependencyVersion
     ),
     devDependencies: undefined

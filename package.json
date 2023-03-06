@@ -4,8 +4,8 @@
   "version": "0.2.0",
   "author": "Tomas Durica",
   "license": "ISC",
-  "description": "",
-  "keywords": [],
+  "description": "Composition-first vue state management",
+  "keywords": ["vue", "state", "management", "store", "typescript", "composition"],
   "scripts": {
     "test": "vitest --run",
     "typecheck": "tsc --noEmit",

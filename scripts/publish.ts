@@ -9,8 +9,8 @@ const publishPackage = async (pkg: Pkg) => {
   execSync(
     [
       'npm publish',
-      '--access public',
-      '--dry-run'
+      '--access public'
+      // '--dry-run'
     ].join(' '),
     { stdio: 'inherit', cwd: `${pkg.path}\\dist` }
   )

@@ -13,7 +13,7 @@ export const createStoreProxy = <TStore extends Store>(
 
   return mapObjectValues(storeDefinition, (value, key) => {
     if (typeof value === 'function') {
-      return mapFunction(() => (unref(store) as Exclude<typeof storeDefinition, Ref>)[key])
+      return mapFunction(() => (unref(store) as Exclude<typeof storeDefinition, Ref>)[key] as typeof value)
     }
 
     if (isRef(value)) {
@@ -34,4 +34,4 @@ const mapRef = <T>(proxy: Fn<never, Ref<T>>) => computed({
 const mapFunction = <
   TArgs extends readonly unknown[],
   TReturn
->(proxy: Fn<TArgs, TReturn>) => (...args: TArgs) => proxy(...args)
+>(proxy: Fn<never, Fn<TArgs, TReturn>>) => (...args: TArgs) => proxy()(...args)
