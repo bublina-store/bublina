@@ -10,7 +10,7 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: /guide/what-is-vitepress
+      link: /guides/introduction
     - theme: alt
       text: Try it on StackBlitz
       link: https://stackblitz.com/github//bublina-store/bublina/tree/main/packages/playground
@@ -21,10 +21,10 @@ hero:
 features:
 - title: Simple and easy to use
   details: If you've ever touched a composition API, you'll feel right at home.
-- title: Not so global state management
+- title: '"Not so global" state management'
   details: A robust instancing system that allows running multiple stores of the same type out of the box.
 - title: No boilerplate
-  details: No need for a complicated actions - mutations - getters setup. It's like writing a composable!
+  details: No need for a complicated actions, mutations and getters setup. It's like writing a composable!
 - title: Devtools included
   details: Devtools support is built-in, so you can debug your state with ease.
 

@@ -7,14 +7,18 @@ export const useLoremStore = createStore('lorem', (id: number) => {
   const isLoading = ref(true)
   const data = ref<string>()
 
-  ;(async () => {
+  const load = async () => {
+    isLoading.value = true
     data.value = await delay(faker.lorem.sentence(8), faker.datatype.number({ min: 2000, max: 5000 }))
     isLoading.value = false
-  })()
+  }
+
+  load().catch()
 
   return {
     id: computed(() => id),
     isLoading,
-    data
+    data,
+    load
   }
 })
