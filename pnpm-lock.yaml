@@ -68,10 +68,10 @@ importers:
     dependencies:
       '@bublina/store': link:../store
       '@faker-js/faker': 7.6.0
-      '@iconify-json/material-symbols': 1.1.32
       vue: 3.2.47
       vue-router: 4.1.6_vue@3.2.47
     devDependencies:
+      '@iconify-json/material-symbols': 1.1.32
       '@unocss/reset': 0.50.1
       '@vitejs/plugin-vue': 4.0.0_vite@4.1.4+vue@3.2.47
       unocss: 0.50.1_vite@4.1.4
@@ -708,10 +708,11 @@ packages:
     resolution: {integrity: sha512-gC05Wcs/rv3IFWyJ1ugFXR7ENQIZ8dVX1tBruV0/jJc7bpUCvNBY8/dEKO5oq/XkTi8Q4bazCgN3NeKcFPlnMg==}
     dependencies:
       '@iconify/types': 2.0.0
-    dev: false
+    dev: true
 
   /@iconify/types/2.0.0:
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
+    dev: true
 
   /@iconify/utils/2.1.4:
     resolution: {integrity: sha512-7vzsYIvxv5Hng0MNEtSSnyMBD/+zqnORqmKiYsSgpMBGSz1r93URgBZHPYCZ1/gpoaVstYW4/SVLGCMJBNMCLQ==}
