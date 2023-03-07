@@ -12,12 +12,10 @@
     "typescript",
     "composition"
   ],
-  "module": "./index.mjs",
-  "types": "./index.d.mts",
   "exports": {
     ".": {
       "types": "./index.d.mts",
-      "import": "./index.mjs"
+      "import": "./index.ts"
     },
     "./*": "./*"
   },

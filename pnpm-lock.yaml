@@ -46,15 +46,18 @@ importers:
 
   packages/docs:
     specifiers:
+      '@vueuse/core': ^9.13.0
       vitepress: 1.0.0-alpha.49
       vue: ^3.2.47
+    dependencies:
+      '@vueuse/core': 9.13.0_vue@3.2.47
     devDependencies:
       vitepress: 1.0.0-alpha.49
       vue: 3.2.47
 
   packages/playground:
     specifiers:
-      '@bublina/store': workspace:*
+      '@bublina/store': ^0.2.1
       '@faker-js/faker': ^7.6.0
       '@iconify-json/material-symbols': ^1.1.32
       '@unocss/reset': ^0.50.1
@@ -992,7 +995,6 @@ packages:
 
   /@types/web-bluetooth/0.0.16:
     resolution: {integrity: sha512-oh8q2Zc32S6gd/j50GowEjKLoOVOwHP/bWVjKJInBwQqdOYMdPrf1oVlelTlyfFK3CKxL1uahMDAr+vy8T7yMQ==}
-    dev: true
 
   /@typescript-eslint/eslint-plugin/5.53.0_cjo54hduev4bqhpjw5znwiokqu:
     resolution: {integrity: sha512-alFpFWNucPLdUOySmXCJpzr6HKC3bu7XooShWM+3w/EL6J2HIoB2PFxpLnq4JauWVk6DiVeNKzQlFEaE+X9sGw==}
@@ -1447,11 +1449,9 @@ packages:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
-    dev: true
 
   /@vueuse/metadata/9.13.0:
     resolution: {integrity: sha512-gdU7TKNAUVlXXLbaF+ZCfte8BjRJQWPCa2J55+7/h+yDtzw3vOoGQDRXzI6pyKyo6bXFT5/QoPE4hAknExjRLQ==}
-    dev: true
 
   /@vueuse/shared/9.13.0_vue@3.2.47:
     resolution: {integrity: sha512-UrnhU+Cnufu4S6JLCPZnkWh0WwZGUp72ktOF2DFptMlOs3TOdVv8xJN53zhHGARmVOsz5KqOls09+J1NR6sBKw==}
@@ -1460,7 +1460,6 @@ packages:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
-    dev: true
 
   /@wessberg/stringutil/1.0.19:
     resolution: {integrity: sha512-9AZHVXWlpN8Cn9k5BC/O0Dzb9E9xfEMXzYrNunwvkUTvuK7xgQPVRZpLo+jWCOZ5r8oBa8NIrHuPEu1hzbb6bg==}
@@ -4609,7 +4608,6 @@ packages:
         optional: true
     dependencies:
       vue: 3.2.47
-    dev: true
 
   /vue-eslint-parser/9.1.0_eslint@8.35.0:
     resolution: {integrity: sha512-NGn/iQy8/Wb7RrRa4aRkokyCZfOUWk19OP5HP6JEozQFX5AoS/t+Z0ZN7FY4LlmWc4FNI922V7cvX28zctN8dQ==}

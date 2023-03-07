@@ -2,7 +2,7 @@ import fs from 'fs'
 
 export const mapObjectValues = <T, U>(obj: Record<string, T>, fn: (value: T, key: string) => U): Record<string, U> => {
   if (!obj) {
-    return undefined
+    return undefined as unknown as Record<string, U>
   }
 
   return Object.fromEntries(
@@ -25,5 +25,6 @@ export const writeJson = async <T>(path: string, obj: T): Promise<void> => {
 export type PackageJson = {
   version?: string,
   dependencies?: Record<string, string>,
-  devDependencies?: Record<string, string>
+  devDependencies?: Record<string, string>,
+  exports?: Record<string, string | Record<string, string>>
 }
