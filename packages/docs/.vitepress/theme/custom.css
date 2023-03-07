@@ -26,3 +26,7 @@
     --vp-button-brand-text: #000;
     --vp-button-brand-hover-text: #000;
 }
+
+.VPHero .clip {
+    text-shadow: 0 0 .5rem var(--vp-c-bg);
+}
