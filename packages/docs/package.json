@@ -9,16 +9,11 @@
     "dev": "vitepress dev"
   },
   "module": "./index.mjs",
-  "types": "./index.d.mts",
-  "exports": {
-    ".": {
-      "types": "./index.d.mts",
-      "import": "./index.mjs"
-    },
-    "./*": "./*"
-  },
   "devDependencies": {
     "vitepress": "1.0.0-alpha.49",
     "vue": "^3.2.47"
+  },
+  "dependencies": {
+    "@vueuse/core": "^9.13.0"
   }
 }
