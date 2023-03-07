@@ -10,7 +10,7 @@ defineProps<{
       <header class="mb-8 flex items-center">
         <button
           class="rounded-12 grid place-items-center hover:bg-dark-300"
-          @click="$router.back()"
+          @click="$router.push({ name: 'index' })"
         >
           <i class="i-material-symbols-chevron-left-rounded h-12 w-12" />
         </button>
