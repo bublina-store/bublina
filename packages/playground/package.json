@@ -10,7 +10,7 @@
     "dev": "vite"
   },
   "dependencies": {
-    "@bublina/store": "workspace:*",
+    "@bublina/store": "^0.2.1",
     "@faker-js/faker": "^7.6.0",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6"

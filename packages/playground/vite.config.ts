@@ -8,8 +8,7 @@ import Unocss from 'unocss/vite'
 export default defineConfig({
   resolve: {
     alias: {
-      '@': `${path.resolve(__dirname, 'src')}/`,
-      '@bublina/store': path.resolve(__dirname, '../store/index.ts')
+      '@': `${path.resolve(__dirname, 'src')}/`
     }
   },
   plugins: [
