@@ -40,16 +40,16 @@
     body.value.style.top = `${offsetY * bodyDistance}px`    
     
     const highlightDistance = relativeDistance * 10
-    highlight.value.style.left = `${offsetX * highlightDistance - 4}px` 
-    highlight.value.style.top = `${offsetY * highlightDistance - 4}px` 
+    highlight.value.style.left = `${offsetX * highlightDistance}px` 
+    highlight.value.style.top = `${offsetY * highlightDistance}px` 
     
-    const leftEyeDistance = relativeDistance * 100    
-    leftEye.value.style.left = `${offsetX * leftEyeDistance}px`
-    leftEye.value.style.top = `${offsetY * leftEyeDistance + offsetX * relativeDistance * 16}px`
+    const eyeHorizontalDistance = relativeDistance * 80    
+    const eyeVerticalDistance = relativeDistance * 100    
+    leftEye.value.style.left = `${offsetX * eyeHorizontalDistance}px`
+    leftEye.value.style.top = `${offsetY * eyeVerticalDistance + offsetX * relativeDistance * 16}px`
 
-    const rightEyeDistance = relativeDistance * 100
-    rightEye.value.style.left = `${offsetX * rightEyeDistance}px`
-    rightEye.value.style.top = `${offsetY * rightEyeDistance - offsetX * relativeDistance * 16}px`
+    rightEye.value.style.left = `${offsetX * eyeHorizontalDistance}px`
+    rightEye.value.style.top = `${offsetY * eyeVerticalDistance - offsetX * relativeDistance * 16}px`
   })
   
 </script>
@@ -81,7 +81,9 @@
   height: var(--body-size);
   border: var(--ink-size) solid var(--ink-color);
   border-radius: 50%;
+  background: var(--border-color);
   box-shadow: #81cfff 0 0 64px 0;
+  padding: calc(var(--ink-size) / 2);
 } 
 
 .highlight {
@@ -90,10 +92,8 @@
   place-items: center;
   grid-template-columns: 1fr 1fr;
   padding: 25%;
-  z-index: -1;
-  width: calc(100% + var(--ink-size) / 2);
-  height: calc(100% + var(--ink-size) / 2);
-  border: var(--ink-size) solid var(--border-color);
+  width: 100%;
+  height: 100%;
   background: var(--highlitght-color);
   border-radius: 50%;
 }
