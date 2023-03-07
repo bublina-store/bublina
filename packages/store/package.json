@@ -1,6 +1,6 @@
 {
   "name": "@bublina/store",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "Tomas Durica",
   "license": "ISC",
   "description": "Composition-first vue state management",
