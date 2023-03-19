@@ -27,3 +27,16 @@ npm install @bublina/store
 ```
 :::
 
+To use the library, you need to install the Vue 3 plugin:
+
+```ts
+import { createApp } from 'vue'
+import App from './App.vue'
+import Bublina from '@bublina/store' // [!code ++]
+
+const app = createApp(App)
+
+app.use(Bublina) // [!code ++]
+
+app.mount('#app')
+```

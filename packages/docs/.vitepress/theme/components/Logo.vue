@@ -1,18 +1,18 @@
 <script setup lang="ts">
   import { ref, computed, watchEffect } from 'vue'  
-  import { useMouseInElement } from '@vueuse/core'
+  import { useMouse } from '@vueuse/core'
   
   const body = ref<HTMLElement>()
   const highlight = ref<HTMLElement>()
   const leftEye = ref<HTMLElement>()
   const rightEye = ref<HTMLElement>()
 
-  const { x, y } = useMouseInElement()
+  const { x, y } = useMouse()
     
   const offset = computed(() => {
     const bbox = highlight.value?.getBoundingClientRect()
     if (!bbox) {
-      return [0, 0]
+      return [0, 0, 0]
     }
     
     const centerX = bbox.left + bbox.width / 2
@@ -27,7 +27,7 @@
   })
   
   watchEffect(() => {
-    if (!leftEye.value || !rightEye.value || !offset.value) {
+    if (!leftEye.value || !rightEye.value || !offset.value || !body.value || !highlight.value) {
       return
     }
     
@@ -69,7 +69,7 @@
 .logo {
   --ink-color: #001e2d;
   --border-color: #007fb0;
-  --highlitght-color: #81cfff;
+  --highlight-color: #81cfff;
   --body-size: 320px;
   --ink-size: 16px;
   --eye-size: 32px;
@@ -94,7 +94,7 @@
   padding: 25%;
   width: 100%;
   height: 100%;
-  background: var(--highlitght-color);
+  background: var(--highlight-color);
   border-radius: 50%;
 }
 
