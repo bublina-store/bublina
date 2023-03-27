@@ -1,4 +1,6 @@
-import type { App } from 'vue'
+// noinspection ES6UnusedImports
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { Ref, ComputedRef, App } from 'vue'
 import type { StoreProvider } from '../storeProvider'
 import { createStoreProvider } from '../storeProvider'
 import { setupDevtools } from '../devtools'
@@ -15,8 +17,8 @@ const defaultOptions = {
   devtools: true
 }
 
-export default {
-  install: (app: App, pluginOptions?: PluginOptions) => {
+export const createBublina = (pluginOptions?: PluginOptions) => ({
+  install: (app: App) => {
     const options = {
       ...defaultOptions,
       ...pluginOptions
@@ -30,6 +32,6 @@ export default {
       setupDevtools(app, { contextProvider: storeProvider })
     }
   }
-}
+})
 
 export const useStoreProvider = () => inject(__STORE_PROVIDER_SYMBOL) as StoreProvider

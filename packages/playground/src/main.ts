@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Bublina from '@bublina/store'
+import { createBublina } from '@bublina/store'
 import App from './app.vue'
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -17,7 +17,7 @@ const router = createRouter({
   routes
 })
 
-app.use(Bublina, { cacheTime: 30 * 1000 })
+app.use(createBublina({ cacheTime: 30 * 1000 }))
 app.use(router)
 
 app.mount('#app')

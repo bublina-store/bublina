@@ -1,5 +1,5 @@
-import { Store, StoreName } from '../types'
-import { Ref } from 'vue'
+import type { Ref } from 'vue'
+import type { Store, StoreName } from '../types'
 import hash from 'fast-json-stable-stringify'
 import { createDependencyTracker } from './dependencyTracker'
 
@@ -69,7 +69,7 @@ export const createStoreDefinition = <TArgs extends readonly unknown[], TStore e
     }, { immediate: true })
   }
 
-  const getStore = (args: Ref<TArgs>) => {
+  function getStore(args: Ref<TArgs>) {
     registerDependency(dependencyTracker.currentDependency(), args)
 
     return computed(() => {

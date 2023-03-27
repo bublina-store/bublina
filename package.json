@@ -15,6 +15,7 @@
   ],
   "scripts": {
     "test": "vitest --run",
+    "test:dev": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint --ext .ts --ignore-pattern packages/playground .",
     "build": "npx tsx scripts/build.ts",

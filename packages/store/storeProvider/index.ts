@@ -1,3 +1,6 @@
+// noinspection ES6UnusedImports
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { Ref, ComputedRef } from 'vue'
 import type { Store, StoreName } from '../types'
 import type { CreateStoreDefinitionOptions, StoreId, StoreInstance } from './storeDefinition'
 import { createDependencyTracker } from './dependencyTracker'

@@ -3,4 +3,4 @@ export type { PluginOptions } from './plugin'
 
 export { createStoreProvider } from './storeProvider'
 export { createStore } from './createStore'
-export { default, useStoreProvider } from './plugin'
+export { createBublina, useStoreProvider } from './plugin'

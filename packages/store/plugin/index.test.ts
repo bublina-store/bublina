@@ -1,4 +1,4 @@
-import plugin, { createStoreProvider, useStoreProvider } from '@bublina/store'
+import { createBublina, createStoreProvider, useStoreProvider } from '@bublina/store'
 
 describe('plugin', () => {
   describe('when contextProvider is passed in options', () => {
@@ -12,7 +12,7 @@ describe('plugin', () => {
           expect(componentContextProvider).toBe(storeProvider)
         }, {
           global: {
-            plugins: [(app) => app.use(plugin, { storeProvider, devtools: false })]
+            plugins: [(app) => app.use(createBublina({ storeProvider, devtools: false }))]
           }
         })
       })
@@ -27,7 +27,7 @@ describe('plugin', () => {
           expect(componentContextProvider1).toBe(componentContextProvider2)
         }, {
           global: {
-            plugins: [(app) => app.use(plugin, { storeProvider, devtools: false })]
+            plugins: [(app) => app.use(createBublina({ storeProvider, devtools: false }))]
           }
         })
       })
@@ -43,7 +43,7 @@ describe('plugin', () => {
         expect(componentContextProvider1).toBe(componentContextProvider2)
       }, {
         global: {
-          plugins: [(app) => app.use(plugin, { devtools: false })]
+          plugins: [(app) => app.use(createBublina({ devtools: false }))]
         }
       })
     })
