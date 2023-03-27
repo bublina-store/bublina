@@ -108,6 +108,6 @@ this will only include state and getters - to use actions, you still need to ref
 
 ## Conclusion
 
-I can't stress enough how awesome Pinia is, even with all of its shortcomings. It's a great library, it satisfied a lot of our needs, and we've build a lot of great software with it.
+We can't stress enough how awesome Pinia is, even with all of its shortcomings. It's a great library, it satisfied a lot of our needs, and we've build a lot of great software with it.
 Unfortunately, we needed a more specialized solution, something that more closely represent our vision on what state management should be able to do, 
 and we thought it may help others - or at least spark some discussions for the next big thing - that's why **Bublina** was created.
