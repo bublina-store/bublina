@@ -68,6 +68,8 @@ const adjustPackageJson = async (pkg: Pkg) => {
 
   const adjustedPackageJson = {
     ...packageJson,
+    module: './index.mjs',
+    types: './index.d.mts',
     exports: {
       ...packageJson.exports,
       '.': {
