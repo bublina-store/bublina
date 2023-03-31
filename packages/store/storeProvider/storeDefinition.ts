@@ -82,16 +82,16 @@ export const createStoreDefinition = <TArgs extends readonly unknown[], TStore e
         return getInstance(storeId)?.store as TStore
       }
 
-      const store = dependencyTracker.withCurrentDependency(storeId, () => {
-        const scope = effectScope()
+      const scope = effectScope(true)
 
+      const store = dependencyTracker.withCurrentDependency(storeId, () => {
         return scope.run(() => setupFn(...argsValue)) as TStore
       })
 
       setInstance(storeId, {
         store,
         onRemoved: () => {
-          if (!cacheTime || cacheTime === Infinity) {
+          if (cacheTime === undefined || cacheTime === Infinity) {
             return
           }
 
@@ -99,6 +99,7 @@ export const createStoreDefinition = <TArgs extends readonly unknown[], TStore e
             storeIds.delete(key)
             dependencyTracker.removeAllDependencies(storeId)
             deleteInstance(storeId)
+            scope.stop()
             timers.delete(storeId)
           }, cacheTime)
 
